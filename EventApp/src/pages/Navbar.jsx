@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserProfile } from '../store/fetchUserSlice';
 import {
   Navbar,
   Collapse,
@@ -27,7 +29,7 @@ import { Link, useLocation,useNavigate} from 'react-router-dom';
 
 const NavList = () => {
   return (
-    <ul className="mb-4 flex flex-col gap-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center mt-2">
+    <ul className="mb-4 flex flex-col gap-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center mt-2 ">
       <Link to=''> <p className="font-medium text-blue-gray-800 hover:underline hover:text-black ">Collages Event</p></Link>
       <Link to=''> <p className="font-medium text-blue-gray-800 hover:underline hover:text-black ">Company Event</p></Link>
       <Link to=''> <p className="font-medium text-blue-gray-800 hover:underline hover:text-black ">Latest Event</p></Link>
@@ -38,6 +40,7 @@ const NavList = () => {
 
 
 const Navbars = () => {
+  const { userInfo} = useSelector(state => state.user);
 
   const [token, setToken] = useState(false)
   const navigate = useNavigate();
@@ -51,6 +54,7 @@ const Navbars = () => {
   const handelLogout = ()=>{
     console.log("logout");
     localStorage.removeItem("authToken")
+    localStorage.removeItem("userInfo")
     navigate('/login')
   }
   const closeMenu = () => setIsMenuOpen(false);
@@ -76,8 +80,8 @@ const Navbars = () => {
 
   return (
     <>
-      <Navbar className={`mx-auto max-w-screen-xl p-2 lg:rounded-full lg:pl-6 mt-5 shadow shadow-xl ${location.pathname === "/login" || location.pathname === '/register' ? "hidden" : ""}`}>
-        <div className="relative flex items-center justify-between text-blue-gray-900 ">
+      <Navbar className={`mx-auto fixed z-50 left-0 right-0   max-w-screen-xl p-2 lg:rounded-full lg:pl-6 mt-5  shadow-xl ${location.pathname === "/login" || location.pathname === '/register' ? "hidden" : ""}`}>
+        <div className="relative mx-auto flex items-center justify-between text-blue-gray-900 ">
           <div className='flex'>
             <label className="mr-4 ml-2 cursor-pointer font-medium flex">
               Event Platform
@@ -115,7 +119,7 @@ const Navbars = () => {
                     size="sm"
                     alt="tania andrew"
                     className="border border-gray-900 p-0.5"
-                    src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
+                    src={`http://localhost:9999/uploads/${userInfo.image}`}
                   />
                   <ChevronDownIcon
                     strokeWidth={2.5}
@@ -127,37 +131,42 @@ const Navbars = () => {
 
               <MenuList className="p-1">
 
+                <Link to='/userprofile'>
                 <MenuItem
                   onClick={closeMenu}
                   className='items-center gap-2 rounded flex'
-                >
+                  >
                   <UserCircleIcon className='h-4 w-4' />
                   <Typography
                     as="span"
                     variant="small"
                     className="font-normal ml-3"
                     color='inherit'
-        
-                  >
+                    
+                    >
                     My Profile
                   </Typography>
                 </MenuItem>
+                    </Link>
 
+                 <Link to='/UserBookedEvent'>
                 <MenuItem
                   onClick={closeMenu}
                   className='items-center gap-2 rounded flex'
-                >
+                  >
                   <Cog6ToothIcon className='h-4 w-4' />
                   <Typography
                     as="span"
                     variant="small"
                     className="font-normal ml-3"
                     color='inherit'
-        
-                  >
-                    Edit Profile
+                    
+                    >
+                    Booked Events
                   </Typography>
                 </MenuItem>
+                    </Link>   
+
                 <MenuItem
                   onClick={handelLogout}
                   className='items-center gap-2 rounded flex hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10'
@@ -173,7 +182,7 @@ const Navbars = () => {
                     Sign Out
                   </Typography>
                 </MenuItem>
-               
+                
               </MenuList>
 
             </Menu>

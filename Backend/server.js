@@ -1,75 +1,89 @@
-const express = require('express')
-const cors = require('cors')
-const mongoose = require('mongoose')
+const express = require('express');
+const cors = require('cors');
+const multer  = require('multer');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const { body } = require('express-validator');
-const {registerRouter, loginUser} = require('./routes/usersRoutes'); 
+const { registerRouter, loginUser, updateProfile, fetchusers } = require('./routes/usersRoutes'); 
 require('dotenv').config();
+const path = require('path');
 
 const server = express();
 const PORT = process.env.PORT || 9999;
 
 // Connect to MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/dbname', {   //mongodb+srv://shivamkumar098798:dYAPQ3FWQydd1JSX@cluster0.2yzapfm.mongodb.net/  
-
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/dbname', {   // Use your actual MongoDB URI
 }).then(() => {
     console.log('Connected to MongoDB');
 }).catch(err => {
     console.error('Error connecting to MongoDB', err);
 });
 
-//middlewere
+// Middleware
 server.use(cors());
 server.use(express.json());
 
-
-// Middleware to fetch user from JWT token
+// JWT Middleware
 const JWTToken = (req, res, next) => {
-    const authToken = req.header('authToken')
-
+    const authToken = req.header('authToken')?.replace('Bearer ', ''); //?.replace('Bearer ', '')
+    
     if (!authToken) {
-        return res.status(401).json({ error: 'please provide valid token' })
+        return res.status(401).json({ error: 'Please provide a valid token' });
     }
-
+    
     try {
         const data = jwt.verify(authToken, process.env.JWT_SECRET);
-        req.user = data.user; // Assuming 'user' is the key in your JWT payload
+        req.user = data.user; 
+        if (!data.user) {
+            return res.status(401).json({ error: 'Invalid token structure' });
+        }
+        
         next();
     } catch (error) {
         console.error('JWT Verification Error:', error);
         return res.status(401).send({ error: 'Invalid token or unauthorized access' });
     }
-
-}
-module.exports = JWTToken
+};
 
 
+// Multer Middleware
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads/'); // Destination folder for uploaded files
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname)); // File renaming logic
+    },
+});
 
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only images are allowed!'), false);
+    }
+};
 
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+server.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
-
-// path all rootes
+// Routes
 server.post('/register', [
     body('username', 'Enter a valid username').isLength({ min: 3 }),
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Enter a valid password').isLength({ min: 6 }),
     body('mobile', 'Enter a valid mobile').isLength({ min: 10 })
+], registerRouter);
 
-  ], registerRouter);
 server.post('/login', [
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Enter a valid password').isLength({ min: 6 }),
-  ], loginUser);
-  
+], loginUser);
 
-
-
+server.post('/updateProfile', JWTToken, upload.single('image'), updateProfile);
+server.get('/profile', JWTToken, fetchusers)
 
 
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
-  });
-
-
-
-
+});
