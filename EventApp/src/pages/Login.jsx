@@ -25,9 +25,9 @@ const Login = () => {
   const [adminData, setAdminData] = useState({ email: '', adminID: '' });
   const [type, setType] = useState("Student");
   const dispatch = useDispatch();
-  const [loadings, setLoadings]=useState(false)
+  const [loadings, setLoadings] = useState(false)
   const navigate = useNavigate();
-  const {loading, error, userInfo } = useSelector((state) => state.user);
+  const { loading, error, userInfo } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,7 +65,7 @@ const Login = () => {
       //       theme: "light",
       //     });
       //     localStorage.setItem('authToken', response.authToken);
-            
+
       //   })
       //   .catch((err) => {
       //     toast.error(err.message)
@@ -73,9 +73,9 @@ const Login = () => {
       //        // Display error message using toast
       //   });
       const response = await dispatch(loginUser(data));
-      if(response.payload){
+      if (response.payload) {
         console.log(response.payload.authToken);
-        localStorage.setItem("authToken",response.payload.authToken)
+        localStorage.setItem("authToken", response.payload.authToken)
         navigate('/')
       }
       setLoadings(false)
@@ -88,7 +88,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen mt-10">
+    <div  className="flex justify-center items-center h-screen mt-10">
       <ToastContainer />
       <ToastContainer
         position="top-right"

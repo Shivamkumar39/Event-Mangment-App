@@ -1,11 +1,14 @@
 import React from 'react';
 import {
+  Button,
   Card,
   CardBody,
   CardHeader,
   Typography,
 } from "@material-tailwind/react";
-import { HomeIcon, Cog6ToothIcon, CalendarIcon } from '@heroicons/react/24/solid'
+import { HomeIcon,  CalendarIcon } from '@heroicons/react/24/solid'
+import { Link } from 'react-router-dom';
+
 
 const ProfileCard = () => {
   return (
@@ -22,19 +25,18 @@ const ProfileCard = () => {
         <CardBody className="w-2/3 text-left p-4">
           <Typography variant="h4" color="blue-gray" className="mb-2 flex flex-row ">
             <CalendarIcon className='h-4 w-4 m-2'/>
-           
             Event Name
           </Typography>
           <Typography variant="h5" color="blue-gray" className="font-medium mb-2 flex flex-row">
             <HomeIcon className='h-4 w-4 m-2'/>
             Event Organizer
           </Typography>
-          <Typography color="blue-gray" className="font-medium" textGradient>
-            event post Date
-          </Typography>
-          <Typography color="blue-gray" className="font-medium" textGradient>
-            Event last Date
-          </Typography>
+         
+
+        <Link><Button className='bg-blue-gray-100 border-black border-2 m-4' >Download Ticket</Button></Link>
+
+
+         <button className='rounded-sm'>Status</button>
         </CardBody>
       </Card>
      </div>
