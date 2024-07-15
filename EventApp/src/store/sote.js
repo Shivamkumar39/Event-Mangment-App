@@ -8,6 +8,7 @@ const store = configureStore({
     user: fetchUserSlice,
     admin: FetchAdminSlice,
   },
+
 });
 
 export default store;

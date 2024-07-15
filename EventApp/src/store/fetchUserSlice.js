@@ -13,7 +13,7 @@ export const registerUser = createAsyncThunk(
 
       return { ...response.data, authToken };
     } catch (error) {
-      console.error('Error registering user:', error.message);
+      
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -33,7 +33,6 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem('userInfo', JSON.stringify(userInfo));
       return { userInfo: userInfo, authToken };
     } catch (error) {
-      console.error('Error logging in user:', error.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -108,7 +107,8 @@ const initialState = {
   userInfo: userInfoFromLocalStorage,
   loading: false,
   error: null,
-  authToken: localStorage.getItem('authToken') || null,
+  authToken:  null, //localStorage.getItem('authToken') ||
+  userInfo: null, // localStorage.getItem('userInfo') ||
 };
 
 // Create user slice with initial state

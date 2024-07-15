@@ -6,6 +6,8 @@ import HomePage from './pages/HomePage'
 import Register from './pages/Register'
 import ProfilePage from './pages/ProfilePage'
 import EventBooked from './components/EventBooked'
+import ProfilePageAdmin from './AdminComponets/ProfilePageAdmin'
+import PostEvents from './AdminComponets/PostEvents'
 
 
 const App = () => {
@@ -24,6 +26,8 @@ const App = () => {
           <Route path='/' element={<HomePage />} />
           <Route path='/UserBookedEvent' element={<EventBooked/>} />
           <Route path='/login' element={<Login />} />
+          <Route path='/adminprofile' element= {<ProfilePageAdmin/>}/>
+          <Route path='/PostEvents' element={<PostEvents/>}/>
           <Route path='/register' element={<Register />} />
           <Route path='/userprofile' element={<ProfilePage />} />
         </Routes>

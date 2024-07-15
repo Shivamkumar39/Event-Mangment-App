@@ -5,11 +5,21 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const { body } = require('express-validator');
 const { registerRouter, loginUser, updateProfile, fetchusers } = require('./routes/usersRoutes'); 
-require('dotenv').config();
 const path = require('path');
+const { AdmiRegister, LoginAdmin, GetSecondAdmin} = require('./routes/adminRoutes');
 
+
+
+
+
+
+require('dotenv').config();
 const server = express();
 const PORT = process.env.PORT || 9999;
+
+
+
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/dbname', {   // Use your actual MongoDB URI
@@ -18,6 +28,9 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/dbname', 
 }).catch(err => {
     console.error('Error connecting to MongoDB', err);
 });
+
+
+
 
 // Middleware
 server.use(cors());
@@ -67,7 +80,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 server.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
+// users Routes
 server.post('/register', [
     body('username', 'Enter a valid username').isLength({ min: 3 }),
     body('email', 'Enter a valid email').isEmail(),
@@ -82,6 +95,28 @@ server.post('/login', [
 
 server.post('/updateProfile', JWTToken, upload.single('image'), updateProfile);
 server.get('/profile', JWTToken, fetchusers)
+
+
+
+
+
+
+
+// Admin Routes
+
+
+server.post('/AdmiRegister', AdmiRegister )
+server.post('/admin-Login', LoginAdmin)
+server.get('/getAdmin', GetSecondAdmin)
+
+
+
+
+
+
+
+
+
 
 
 server.listen(PORT, () => {
