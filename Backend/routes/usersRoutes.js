@@ -78,7 +78,7 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ error: 'Incorrect password' });
     }
 
-    const data = {
+    const jwtuserdata = {
       user: {
         id: user.id,
         email: user.email,
@@ -88,7 +88,7 @@ const loginUser = async (req, res) => {
       }
     };
 
-    const authToken = jwt.sign(data, process.env.JWT_SECRET);
+    const authToken = jwt.sign(jwtuserdata, process.env.JWT_SECRET);
 
     res.json({ authToken, userInfo: data.user });
     // console.log("🚀 ~ loginUser ~ user:", user)
@@ -107,18 +107,38 @@ function isValidEmail(email) {
 
 
 const updateProfile = async (req, res) => {
-  const { username, email, mobile } = req.body;
+  const { username, email, mobile, deleteImage } = req.body;
   const image = req.file ? req.file.filename : null;
   try {
     
     // Find and update the user by id
-    let userInfo = await User.findByIdAndUpdate(req.user.id, {
+    // let userInfo = await User.findByIdAndUpdate(req.user.id, {
+    //   username: username,
+    //   email: email,
+    //   mobile: mobile,
+    //   image: image
+      
+    // }, { new: true });
+    const emailExists = await User.findOne({ email: email, _id: { $ne: req.user.id } });
+    if (emailExists) {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
+    const updateData = {
+
       username: username,
       email: email,
       mobile: mobile,
-      image: image
-    }, { new: true }); // { new: true } ensures you get the updated document
+    }// { new: true } ensures you get the updated document
+    if (deleteImage === 'true') {
+      updateData.image = null; // Set image to null if deleteImage flag is true
+    } else if (!userInfo.image && image) {
+      updateData.image = image; // Only update the image if it is not already present and deleteImage is not true
+    } else if (image) {
+      updateData.image = image; // Update the image if a new image is provided
+    }
 
+
+    userInfo = await User.findByIdAndUpdate(req.user.id, updateData, { new: true });
     // Check if user was found and updated
     if (!userInfo) {
       return res.status(404).json({ error: 'User not found' });

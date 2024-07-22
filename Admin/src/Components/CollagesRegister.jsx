@@ -20,11 +20,31 @@ const CollagesRegister = () => {
 
   const fetchSecondAdmins = async () => {
     try {
-      const response = await fetch('http://localhost:9999/getAdmin');
-      const data = await response.json();
-      setSecondAdmins(data);
+      const authToken = localStorage.getItem('authToken');  // Retrieve auth token from localStorage or wherever it's stored
+
+      const response = await fetch('http://localhost:9999/getAdminProfile', 
+        {
+        method: 'GET',
+        headers: {
+          authToken: `Bearer ${authToken}` // Corrected header name to Authorization
+        }
+      });
+
+      // if (!response.ok) {
+      //   throw new Error('Failed to fetch admin profiles');
+      // }
+
+      const adminInfo = await response.json();
+
+      if (Array.isArray(adminInfo)) {
+        setSecondAdmins(adminInfo);
+      } else {
+        console.error('Fetch returned non-array data:', adminInfo);
+        // Handle unexpected response format
+      }
     } catch (error) {
-      console.error('Error fetching second admins:', error);
+      console.log('Error fetching second admins:', error);
+      // Handle network errors or other exceptions
     }
   };
 
@@ -128,21 +148,21 @@ const CollagesRegister = () => {
         </div>
         <Card className="w-[100%] h-[70%]  overflow-y-scroll">
           <List>
-            {filteredAdmins.map((admin) => (
-              <ListItem key={admin._id}>
+            {filteredAdmins.map((adminInfo) => (
+              <ListItem key={adminInfo._id}>
                 <ListItemPrefix>
                   <Avatar
                     variant="circular"
-                    alt={admin.username}
-                    src={admin.image ? `http://localhost:9999/uploads/${admin.image}` : `https://via.placeholder.com/150`}
+                    alt={adminInfo.username}
+                    src={adminInfo.image ? `http://localhost:9999/uploads/${adminInfo.image}` : `https://via.placeholder.com/150`}
                   />
                 </ListItemPrefix>
                 <div>
                   <Typography variant="h6" color="blue-gray">
-                    {admin.username}
+                    {adminInfo.username}
                   </Typography>
                   <Typography variant="small" color="gray" className="font-normal">
-                    {admin.email}
+                    {adminInfo.email}
                   </Typography>
                 </div>
               </ListItem>

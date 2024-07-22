@@ -32,8 +32,10 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem('authToken', authToken);
       localStorage.setItem('userInfo', JSON.stringify(userInfo));
       return { userInfo: userInfo, authToken };
+
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      console.log({error});
+      throw error;
     }
   }
 );
@@ -72,11 +74,13 @@ export const updateUserProfile = createAsyncThunk(
   
     try {
       const formData = new FormData();
-      formData.append('id', profileData.id);
+      // formData.append('id', profileData.id);
       formData.append('username', profileData.username);
       formData.append('email', profileData.email);
       formData.append('mobile', profileData.mobile);
-      if (profileData.image) {
+      if (profileData.deleteImage) {
+        formData.append('deleteImage', profileData.deleteImage);
+      } else if (profileData.image) {
         formData.append('image', profileData.image);
       }
 
@@ -103,24 +107,21 @@ export const updateUserProfile = createAsyncThunk(
 // Get user info from localStorage
 const userInfoFromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
 
-const initialState = {
-  userInfo: userInfoFromLocalStorage,
-  loading: false,
-  error: null,
-  authToken:  null, //localStorage.getItem('authToken') ||
-  userInfo: null, // localStorage.getItem('userInfo') ||
-};
-
 // Create user slice with initial state
 const userSlice = createSlice({
   name: 'user',
-  initialState,
+  initialState: {
+    userInfo: userInfoFromLocalStorage,
+    loading: false,
+    error: null,
+    authToken:  null,
+  },
   reducers: {
     logoutUser: (state) => {
       state.userInfo = null;
       state.authToken = null;
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userInfo');
+      // localStorage.removeItem('authToken');
+      // localStorage.removeItem('userInfo');
     },
   },
   extraReducers: (builder) => {
@@ -148,7 +149,6 @@ const userSlice = createSlice({
         state.loading = false;
         state.userInfo = action.payload.userInfo;
         state.authToken = action.payload.authToken;
-        state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;

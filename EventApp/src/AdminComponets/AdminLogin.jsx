@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Button, Dialog, Card, CardBody, CardFooter, Typography, Input, Checkbox } from "@material-tailwind/react";
+import { Button, Dialog, Card, CardBody, CardFooter, Typography, Input } from "@material-tailwind/react";
 import { loginAdmin } from '../store/FetchAdminSlice';
+import { toast, ToastContainer } from 'react-toastify';
 
 const AdminLogin = ({ open, setOpen }) => {
   const dispatch = useDispatch();
@@ -20,24 +21,56 @@ const AdminLogin = ({ open, setOpen }) => {
     setError(''); // Clear any previous errors
     try {
       const resultAction = await dispatch(loginAdmin({ email, AdminCode: password }));
-      if (loginAdmin.fulfilled.match(resultAction)) {
+      //console.log({resultAction});
+      if(resultAction.payload.success){
+        toast.success("Succesfully login", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+       // console.log(resultAction.payload.authToken);
         setOpen(false);
-        navigate('/');
-      } else {
-        setError(resultAction.payload);
+        localStorage.setItem("authToken",resultAction.payload.authToken)
+        navigate('/')
+        
+      }else{
+        setError(resultAction.payload)
+        toast.error(resultAction.payload, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
+      // if (loginAdmin.fulfilled.match(resultAction)) {
+      //   setOpen(false);
+      //   navigate('/');
+      // } else {
+      //   setError(resultAction.payload);
+      // }
     } catch (error) {
       setError('An unexpected error occurred. Please try again.');
     }
   };
 
   return (
+    <>
     <Dialog
       size="xs"
       open={open}
       handler={handleClose}
       className="bg-transparent shadow-none"
-    >
+      >
+      <ToastContainer/>
       <Card className="mx-auto w-full max-w-[24rem]">
         <form onSubmit={handleSubmit}>
           <CardBody className="flex flex-col gap-4">
@@ -47,21 +80,17 @@ const AdminLogin = ({ open, setOpen }) => {
             <Input label="Email" size="lg" value={email} required onChange={(e) => setEmail(e.target.value)} />
             <Typography className="-mb-2" variant="h6">Your Password</Typography>
             <Input label="Password" size="lg" type="password" value={password} required onChange={(e) => setPassword(e.target.value)} />
-            <div className="-ml-2.5 -mt-3">
-              <Checkbox label="Remember Me" />
-            </div>
+            
           </CardBody>
           <CardFooter className="pt-0">
             <Button variant="gradient" type="submit" fullWidth>Sign In</Button>
-            <Typography variant="small" className="mt-4 flex justify-center">
-              Don&apos;t have an account?
-              <Typography as="a" href="#signup" variant="small" color="blue-gray" className="ml-1 font-bold" onClick={handleClose}>Sign up</Typography>
-            </Typography>
+           
             {error && <Typography color="red" className="mt-2">{error}</Typography>}
           </CardFooter>
         </form>
       </Card>
     </Dialog>
+    </>
   );
 };
 

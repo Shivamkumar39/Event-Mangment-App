@@ -189,15 +189,18 @@ const Navbars = () => {
 
     if (localStorage.getItem("authToken")) {
       setToken(true);
+    }else{
+      setToken(false)
     }
+    console.log("change in token");
   }, [localStorage.getItem("authToken")]);
 
   const handleLogout = () => {
     console.log("logout");
     localStorage.removeItem("authToken");
-    localStorage.removeItem("userInfo");
-    localStorage.removeItem("adminInfo");
-    localStorage.removeItem('adminId');
+    // localStorage.removeItem("userInfo");
+    // localStorage.removeItem("adminInfo");
+    // localStorage.removeItem('adminId');
     navigate('/');
   };
 
@@ -208,8 +211,8 @@ const Navbars = () => {
   };
 
   // Debugging: Log userInfo and adminInfo
-  console.log('userInfo:', userInfo);
-  console.log('adminInfo:', adminInfo);
+  // console.log('userInfo:', userInfo);
+  // console.log('adminInfo:', adminInfo);
 
   return (
     <>

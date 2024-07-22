@@ -11,6 +11,7 @@ import {
   Checkbox,
 } from "@material-tailwind/react";
 import { updateUserProfile } from '../store/fetchUserSlice';
+import { MdDelete } from "react-icons/md";
 
 const UpdateProfileDialog = ({ open, onClose }) => {
   const { userInfo } = useSelector(state => state.user);
@@ -18,7 +19,8 @@ const UpdateProfileDialog = ({ open, onClose }) => {
     username: userInfo?.username || '',
     email: userInfo?.email || '',
     mobile: userInfo?.mobile || '',
-    image: userInfo?.image || null,
+    image: userInfo?.image || '',
+    deleteImage: false,
   });
 
   useEffect(() => {
@@ -27,7 +29,8 @@ const UpdateProfileDialog = ({ open, onClose }) => {
         username: userInfo.username || '',
         email: userInfo.email || '',
         mobile: userInfo.mobile || '',
-        image: userInfo.image || null,
+        image: userInfo.image || '',
+        deleteImage: false,
       });
     }
   }, [userInfo]);
@@ -45,8 +48,11 @@ const UpdateProfileDialog = ({ open, onClose }) => {
     setProfileData((prevState) => ({
       ...prevState,
       image: file,
+      deleteImage: false, // If a new image is selected, we do not want to delete the current image
     }));
   };
+
+ 
 
   const dispatch = useDispatch();
 
@@ -66,11 +72,11 @@ const UpdateProfileDialog = ({ open, onClose }) => {
 
   return (
     <Dialog size="xs" open={open} onClose={onClose} className="bg-transparent shadow-none">
-      <form onSubmit={handleSubmit} >
+      <form onSubmit={handleSubmit}>
         <Card className="mx-auto w-full max-w-[24rem]">
-        <Button variant="gradient" type="button" className='w-20 h-8 items-center' onClick={handleClose}>
-        Close
-      </Button>
+          <Button variant="gradient" type="button" className='w-20 h-8 items-center' onClick={handleClose}>
+            Close
+          </Button>
           <CardBody className="flex flex-col gap-4">
             <Typography variant="h4" color="blue-gray">
               Update Profile
@@ -93,23 +99,16 @@ const UpdateProfileDialog = ({ open, onClose }) => {
             <Typography className="-mb-2" variant="h6">
               Profile Picture
             </Typography>
-            <Input name="image" type="file" onChange={handleImageChange} />
-            <div className="-ml-2.5 -mt-3">
-              <Checkbox label="Remember Me" />
+            <div className="flex items-center gap-2">
+              <Input name="image" type="file" onChange={handleImageChange} />
+              <MdDelete size={24}/>
             </div>
           </CardBody>
           <CardFooter className="pt-0">
             <Button variant="gradient" type="submit" fullWidth>
               Update Profile
             </Button>
-            <Typography variant="small" className="mt-4 flex justify-center">
-              Don&apos;t have an account?
-              <Typography as="a" href="#signup" variant="small" color="blue-gray" className="ml-1 font-bold" onClick={handleClose}>
-                Sign up
-              </Typography>
-            </Typography>
           </CardFooter>
-     
         </Card>
       </form>
     </Dialog>

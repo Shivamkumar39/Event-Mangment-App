@@ -18,8 +18,25 @@ const SecondAdminSchema = new Schema({
     type: String,
     required: true
   },
-  image:{
+  image: {
     type: String,
+    default: ''  // Default empty string
+  },
+  linkedIn: {
+    type: String,
+    default: ''  // Default empty string
+  },
+  website: {
+    type: String,
+    default: ''  // Default empty string
+  },
+  github: {
+    type: String,
+    default: ''  // Default empty string
+  },
+  instagram: {
+    type: String,
+    default: ''  // Default empty string
   }
 });
 

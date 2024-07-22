@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const { body } = require('express-validator');
 const { registerRouter, loginUser, updateProfile, fetchusers } = require('./routes/usersRoutes'); 
 const path = require('path');
-const { AdmiRegister, LoginAdmin, GetSecondAdmin} = require('./routes/adminRoutes');
+const { AdmiRegister, LoginAdmin, GetSecondAdmin, updateadminProfile, GetSecondAdminfontent} = require('./routes/adminRoutes');
 
 
 
@@ -38,18 +38,27 @@ server.use(express.json());
 
 // JWT Middleware
 const JWTToken = (req, res, next) => {
-    const authToken = req.header('authToken')?.replace('Bearer ', ''); //?.replace('Bearer ', '')
+    const authToken = req.header('authToken')?.replace('Bearer ',''); //?.replace('Bearer ', '')
     
     if (!authToken) {
         return res.status(401).json({ error: 'Please provide a valid token' });
     }
-    
+
     try {
+        // const data = jwt.verify(authToken, process.env.JWT_SECRET);
+        // req.user = data.user || data.admin; 
+        // if (!data.user) {
+        //     return res.status(401).json({ error: 'Invalid token structure' });
+        // }
+
         const data = jwt.verify(authToken, process.env.JWT_SECRET);
-        req.user = data.user; 
-        if (!data.user) {
-            return res.status(401).json({ error: 'Invalid token structure' });
+
+        if (!data.user && !data.admin) {
+          return res.status(401).json({ error: 'Invalid token structure' });
         }
+    
+        req.user = data.user || null;
+        req.admin = data.admin || null;
         
         next();
     } catch (error) {
@@ -103,11 +112,11 @@ server.get('/profile', JWTToken, fetchusers)
 
 
 // Admin Routes
-
-
-server.post('/AdmiRegister', AdmiRegister )
+server.post('/AdmiRegister', AdmiRegister)
 server.post('/admin-Login', LoginAdmin)
-server.get('/getAdmin', GetSecondAdmin)
+server.get('/getAdminProfile',  GetSecondAdmin)
+server.get('/adminprofileFrontent',JWTToken, GetSecondAdminfontent)
+server.post('/updateadminProfile',JWTToken,  upload.single('image'), updateadminProfile)
 
 
 
