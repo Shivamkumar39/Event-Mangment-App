@@ -6,34 +6,15 @@ const API_BASE_URL = 'http://localhost:9999';
 // Get user info from localStorage
 const AdminInfoFromLocalStorage = localStorage.getItem('adminInfo') ? JSON.parse(localStorage.getItem('adminInfo')) : null;
 
-// const initialState = {
-//   adminInfo: AdminInfoFromLocalStorage,
-//   loading: false,
-//   error: null
-// };
 
-// export const loginAdmin = createAsyncThunk('loginAdmin', async (credentials, { rejectWithValue }) => {
-//   try {
-//     const response = await axios.post(`${API_BASE_URL}/admin-Login`, credentials);
-//     const { authToken, adminInfo } = response.data;
-
-//     // Save authToken and adminInfo to localStorage
-//     localStorage.setItem('authToken', authToken);
-//     localStorage.setItem('adminId', adminInfo.id);
-//     localStorage.setItem('adminInfo', JSON.stringify(adminInfo));
-//       console.log(adminInfo);
-//     return {adminInfo, authToken};
-//   } catch (error) {
-//     const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
-//     return rejectWithValue(errorMessage);
-//   }
-// });
 
 export const loginAdmin = createAsyncThunk('loginAdmin', async (credentials, { rejectWithValue }) => {
   try {
-
     const response = await axios.post(`${API_BASE_URL}/admin-Login`, credentials);
-    
+    const { authToken, adminInfo } = response.data;
+    localStorage.setItem('authToken', authToken);
+    localStorage.setItem('adminInfo', JSON.stringify(adminInfo));
+
     return response.data;
   } catch (error) {
     const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
@@ -73,12 +54,17 @@ export const FetchAdminProfile = createAsyncThunk('adminprofileFrontent', async 
 });
 
 
+
+//admin info without token 
+
+
 export const updateAdminProfile = createAsyncThunk(
   'updateAdminProfile',
   async (adminData, { rejectWithValue }) => {
     try {
       const formData = new FormData();
       formData.append('username', adminData.username);
+      formData.append('organizername', adminData.organizername);
       formData.append('email', adminData.email);
       formData.append('mobile', adminData.mobile);
       formData.append('linkedIn', adminData.linkedIn);
@@ -119,16 +105,16 @@ const adminSlice = createSlice({
     adminInfo: AdminInfoFromLocalStorage,
     loading: false,
     error: null,
-    authToken:null
+    authToken: localStorage.getItem('authToken') || null
   },
   reducers: {
     logoutAdmin: (state) => {
       state.adminInfo = null;
       state.authToken = null;
       state.adminId = null;
-      // localStorage.removeItem('authToken');
+       localStorage.removeItem('authToken');
       // localStorage.removeItem('adminId');
-      // localStorage.removeItem('adminInfo');
+       localStorage.removeItem('adminInfo');
     },
   },
   extraReducers: (builder) => {
@@ -144,9 +130,7 @@ const adminSlice = createSlice({
         state.loading = false;
         state.adminInfo = action.payload.adminInfo
         state.authToken = action.payload.authToken
-       // console.log(action.payload);        // state.adminInfo = action.payload.adminInfo;
-        // state.authToken = action.payload.authToken;
-        // state.adminId = action.payload.adminInfo.id;
+       
       })
       .addCase(loginAdmin.rejected, (state, action) => {
         state.loading = false;
@@ -160,7 +144,7 @@ const adminSlice = createSlice({
       .addCase(FetchAdminProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.adminInfo = action.payload.data;
-        console.log(action.payload);
+        //console.log(action.payload);
       })
       .addCase(FetchAdminProfile.rejected, (state, action) => {
         state.loading = false;

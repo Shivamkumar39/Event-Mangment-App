@@ -22,7 +22,9 @@ import {
 } from "@heroicons/react/24/solid";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AdminLogin from '../AdminComponets/AdminLogin';
-
+import { logoutAdmin } from '../store/FetchAdminSlice';
+import { logoutUser } from '../store/fetchUserSlice';
+import logoPng  from '../assets/logo.png'
 // User menu list component
 const UserMenuList = ({ closeMenu, handleLogout }) => (
   <MenuList className="p-1">
@@ -163,10 +165,11 @@ const AdminMenuList = ({ closeMenu, handleLogout }) => (
 );
 
 const NavList = () => (
-  <ul className="mb-4 flex flex-col gap-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center mt-2">
+  <ul className="flex flex-col gap-4 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center ">
     <Link to=''><p className="font-medium text-blue-gray-800 hover:underline hover:text-black">Collages Event</p></Link>
     <Link to=''><p className="font-medium text-blue-gray-800 hover:underline hover:text-black">Company Event</p></Link>
-    <Link to=''><p className="font-medium text-blue-gray-800 hover:underline hover:text-black">Latest Event</p></Link>
+    <Link to=''><p className="font-medium text-blue-gray-800 hover:underline hover:text-black">Government Event</p></Link>
+    
   </ul>
 );
 
@@ -181,6 +184,8 @@ const Navbars = () => {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const location = useLocation();
 
+   const dispatch = useDispatch()
+
   useEffect(() => {
     window.addEventListener(
       "resize",
@@ -192,14 +197,16 @@ const Navbars = () => {
     }else{
       setToken(false)
     }
-    console.log("change in token");
+   // console.log("change in token");
   }, [localStorage.getItem("authToken")]);
 
   const handleLogout = () => {
     console.log("logout");
     localStorage.removeItem("authToken");
-    // localStorage.removeItem("userInfo");
-    // localStorage.removeItem("adminInfo");
+    dispatch(logoutAdmin())
+    localStorage.removeItem("adminInfo");
+    localStorage.removeItem("userInfo");
+     dispatch(logoutUser())
     // localStorage.removeItem('adminId');
     navigate('/');
   };
@@ -216,9 +223,10 @@ const Navbars = () => {
 
   return (
     <>
-      <Navbar className={`mx-auto fixed z-50 left-0 right-0 max-w-screen-xl p-2 lg:rounded-full lg:pl-6 mt-5 shadow-xl ${location.pathname === "/login" || location.pathname === '/register' ? "hidden" : ""}`}>
+      <Navbar className={`mx-auto fixed z-50 w-full shadow-xl max-w-full ${location.pathname === "/login" || location.pathname === '/register' ? "hidden" : ""}`}>
         <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
           <div className='flex'>
+          <img src={logoPng}  className='w-20 h-10'/>
             <Link to='/'>
               <label className="mr-4 ml-2 cursor-pointer font-extrabold flex text-xl ">
                 Event Platform

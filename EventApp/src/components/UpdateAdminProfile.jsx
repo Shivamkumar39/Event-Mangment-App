@@ -11,12 +11,14 @@ import {
   Checkbox,
 } from "@material-tailwind/react";
 import { updateAdminProfile, FetchAdminProfile } from '../store/FetchAdminSlice';
-import { LinkIcon } from '@heroicons/react/24/solid';
+
 
 const UpdatingAdminProfile = ({ open, onClose }) => {
   const { adminInfo } = useSelector(state => state.admin);
+
   const [adminData, setAdminData] = useState({
     username: adminInfo?.username || '',
+    organizername: adminInfo?.organizername || '',
     email: adminInfo?.email || '',
     linkedIn: adminInfo?.linkedIn || '',
     website: adminInfo?.website || '',
@@ -29,6 +31,7 @@ const UpdatingAdminProfile = ({ open, onClose }) => {
     if (adminInfo) {
       setAdminData({
         username: adminInfo.username || '',
+        organizername: adminInfo.organizername || '',
         email: adminInfo.email || '',
         linkedIn: adminInfo.linkedIn || '',
         website: adminInfo.website || '',
@@ -38,6 +41,8 @@ const UpdatingAdminProfile = ({ open, onClose }) => {
       });
     }
   }, [adminInfo]);
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -91,15 +96,19 @@ const UpdatingAdminProfile = ({ open, onClose }) => {
             </Typography>
             <Input name="username" label="Username" size="lg" value={adminData.username} onChange={handleInputChange} />
             <Typography className="-mb-2" variant="h6">
+              organizername
+            </Typography>
+            <Input name="organizername" label="organizername" size="lg" value={adminData.organizername} onChange={handleInputChange} />
+            <Typography className="-mb-2" variant="h6">
               Email
             </Typography>
             <Input name="email" label="Email" size="lg" value={adminData.email} onChange={handleInputChange} />
             <Typography className="-mb-2" variant="h6">
-              LinkedIn 
+              LinkedIn
             </Typography>
             <Input name="linkedIn" label="LinkedIn" size="lg" value={adminData.linkedIn} onChange={handleInputChange} />
             <Typography className="-mb-2" variant="h6">
-              Website 
+              Website
             </Typography>
             <Input name="website" label="Website" size="lg" value={adminData.website} onChange={handleInputChange} />
             <Typography className="-mb-2" variant="h6">
@@ -113,9 +122,16 @@ const UpdatingAdminProfile = ({ open, onClose }) => {
             <Typography className="-mb-2" variant="h6">
               Profile Picture
             </Typography>
-            <Input name="image" type="file" onChange={handleImageChange} />
-            <div className="-ml-2.5 -mt-3">
-              <Checkbox label="Remember Me" />
+            <div>
+              {adminInfo.image ? (
+                <img src={adminInfo.image} alt=" Profile Image all ready Uploaded" />
+              ) : (
+                <Input
+                  name="image"
+                  type="file"
+                  onChange={handleImageChange}
+                />
+              )}
             </div>
           </CardBody>
           <CardFooter className="pt-0">

@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import UpdatingAdminProfile from '../components/UpdateAdminProfile';
 
+
 const ProfilePageAdmin = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
@@ -51,6 +52,13 @@ const ProfilePageAdmin = () => {
   },[])
 
 
+  // const handleDelete = () => {
+  //   if (filename) {
+  //     dispatch(deleteImage(filename));
+  //   } else {
+  //     console.error('Filename is undefined');
+  //   }
+  // };
 
   // Handle loading state
   if (loading) {
@@ -82,7 +90,7 @@ const ProfilePageAdmin = () => {
   return (
     <>
      <ToastContainer/>
-      <div className="flex justify-center items-center min-h-screen ">
+      <div className="flex justify-center items-center min-h-screen mr-20 ml-20 ">
         <div className="relative border-4 rounded-md text-black h-[30%]">
           <Button onClick={handleOpen} className="right-0 m-3 h-10 w-32 flex items-center">
             Edit Profile
@@ -98,14 +106,25 @@ const ProfilePageAdmin = () => {
               <Avatar
                 size="lg"
                 variant="circular"
-                className='h-[20%] w-[15%]'
+                className='h-[20%] w-[15%] '
                 src={`http://localhost:9999/uploads/${adminInfo.image}`}
                 alt={adminInfo.username}
               />
-              <div className="flex flex-col gap-0.5">
+              {/* <MdDelete  onClick={handleDelete} disabled={loadings}/>
+            {loadings ? 'Deleting...' : 'Delete Image'}
+            <div className="-ml-2.5 -mt-3">
+            {errors && <p style={{ color: 'red' }}>{errors}</p>}
+            {success && <p style={{ color: 'green' }}>Image deleted successfully!</p>}
+            </div> */}
+              
+              <div className="flex flex-col gap-0.5 ml-10">
                 <div className="flex items-center">
                   <label className="font-semibold">Username: </label>
                   <span className="ml-2">{adminInfo.username}</span>
+                </div>
+                <div className="flex items-center">
+                  <label className="font-semibold">organizername: </label>
+                  <span className="ml-2">{adminInfo.organizername}</span>
                 </div>
                 <div className="flex items-center">
                   <label className="font-semibold">Email: </label>

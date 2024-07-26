@@ -9,6 +9,9 @@ const SecondAdminSchema = new Schema({
     required: true,
     unique: true
   },
+  organizername:{
+    type: String
+  },
   email:{
     type: String,
     require: true,

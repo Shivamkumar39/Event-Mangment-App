@@ -3,10 +3,11 @@ const cors = require('cors');
 const multer  = require('multer');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { body } = require('express-validator');
+const { body, check } = require('express-validator');
 const { registerRouter, loginUser, updateProfile, fetchusers } = require('./routes/usersRoutes'); 
 const path = require('path');
-const { AdmiRegister, LoginAdmin, GetSecondAdmin, updateadminProfile, GetSecondAdminfontent} = require('./routes/adminRoutes');
+const { AdmiRegister, LoginAdmin, GetSecondAdmin, updateadminProfile, GetSecondAdminfontent, imageDelete} = require('./routes/adminRoutes');
+const { postevent, FetchDataById, EventOnging, EventUpcoming, Eventcompleted } = require('./routes/eventRoutes');
 
 
 
@@ -120,12 +121,17 @@ server.post('/updateadminProfile',JWTToken,  upload.single('image'), updateadmin
 
 
 
+//event paost and fetch
+server.post(
+    '/postevent', 
+    JWTToken,
+    upload.single('image'), postevent)
 
+server.get('/events', JWTToken, FetchDataById)
 
-
-
-
-
+server.get('/events/ongoing', EventOnging)
+server.get('/events/upcoming', EventUpcoming)
+server.get('/events/completed', Eventcompleted)
 
 
 server.listen(PORT, () => {

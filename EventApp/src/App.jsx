@@ -8,14 +8,14 @@ import ProfilePage from './pages/ProfilePage'
 import EventBooked from './components/EventBooked'
 import ProfilePageAdmin from './AdminComponets/ProfilePageAdmin'
 import PostEvents from './AdminComponets/PostEvents'
-
+import './App.css'
 
 const App = () => {
   return (
     <BrowserRouter>
-    <div className='h-screen'>
+    <div className='h-screen '>
       
-      <div className='h-[15%]'>
+      <div className='h-[15%] '>
         <Navbars />
 
       </div>
@@ -30,6 +30,7 @@ const App = () => {
           <Route path='/PostEvents' element={<PostEvents/>}/>
           <Route path='/register' element={<Register />} />
           <Route path='/userprofile' element={<ProfilePage />} />
+          
         </Routes>
       </div>
 

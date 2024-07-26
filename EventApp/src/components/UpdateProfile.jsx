@@ -100,8 +100,18 @@ const UpdateProfileDialog = ({ open, onClose }) => {
               Profile Picture
             </Typography>
             <div className="flex items-center gap-2">
-              <Input name="image" type="file" onChange={handleImageChange} />
-              <MdDelete size={24}/>
+            <div>
+              {userInfo.image ? (
+                <img src={userInfo.image} alt=" Profile Image all ready Uploaded" />
+              ) : (
+                <Input
+                  name="image"
+                  type="file"
+                  onChange={handleImageChange}
+                />
+              )}
+            </div>
+              
             </div>
           </CardBody>
           <CardFooter className="pt-0">

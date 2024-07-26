@@ -2,46 +2,68 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const eventSchema = new Schema({
-  img: { 
+  image: { 
     type: String, 
-    default:"" 
+    default: "" 
   },
-  title: {
+  eventname: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  postDate: {
     type: String,
     required: true
   },
-  description: {
+  lastDate: {
     type: String,
     required: true
   },
-  date: {
-    type: Date,
-    required: true
-  },
-  time: {
+  Eventdate: {
     type: String,
     required: true
   },
   location: {
     type: String,
-    required: true
+    required: true,
+    trim: true,
   },
-  organizer: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  organizername:{
+    type: String
+  },
+  category: {
+    type: String,
+    required: true,
+    //trim: true,
+   // enum: ['college events', 'company events', 'government/city events'],
+  },
+  description: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  price: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  capacity: {
+    type: Number,
+    required: true,
+    default: 0,
   },
   participants: [{
     type: Schema.Types.ObjectId,
     ref: 'User'
   }],
-  video:{
+  status: {
     type: String,
-    require: false
+    enum: ['upcoming', 'ongoing', 'completed'],
+    default: 'upcoming',
   },
-  createdAt: {
-    type: Date,
-    default: Date.now().toLocaleString(),
+  orgnizerId: {
+    type: Schema.Types.ObjectId,
+    ref:"SecondAdmin"
   }
 });
 

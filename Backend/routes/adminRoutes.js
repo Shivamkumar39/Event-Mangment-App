@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const SecondAdmin = require('../Schema/admin');
 const server = express.Router();
+const fs = require('fs');
+const path = require('path');
 
 // Middleware
 server.use(express.json());
@@ -13,7 +15,6 @@ const AdmiRegister = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
   const { username, email, AdminCode, linkedIn, website, github, instagram, image } = req.body;
 
 
@@ -70,6 +71,7 @@ const LoginAdmin = async (req, res) => {
       admin: {
         id: admin._id,
         username: admin.username,
+        organizername: admin.organizername,
         email: admin.email,
         image: admin.image || "",
         linkedIn: admin.linkedIn || "",
@@ -98,7 +100,7 @@ const LoginAdmin = async (req, res) => {
 const GetSecondAdmin = async (req, res) => {
   try {
     // Fetch second admin profiles with limited fields
-    const adminInfo = await SecondAdmin.find().select('username email image');
+    const adminInfo = await SecondAdmin.find().select('username organizername email image linkedIn website github instagram');
 
     // Check if any admin profiles were found
     if (!adminInfo || adminInfo.length === 0) {
@@ -109,8 +111,13 @@ const GetSecondAdmin = async (req, res) => {
     const adminsData = adminInfo.map(admin => ({
       _id: admin._id,
       username: admin.username,
+      organizername: admin.organizername,
       email: admin.email,
-      image: admin.image
+      image: admin.image,
+      linkedIn: admin.linkedIn,
+      website: admin.website,
+      github: admin.github, 
+      instagram: admin.instagram
     }));
 
     res.status(200).json(adminsData);
@@ -145,16 +152,38 @@ const GetSecondAdminfontent = async (req, res) => {
 };
 
 
-// Updating admin profile
 const updateadminProfile = async (req, res) => {
-  const { username, email, linkedIn, website, github, instagram } = req.body;
-  const image = req.file ? req.file.filename : null;
+  const { username, organizername, email, linkedIn, website, github, instagram } = req.body;
+  const newImage = req.file ? req.file.filename : null;
 
   try {
-    let adminInfo = await SecondAdmin.findByIdAndUpdate(
+    // Retrieve the current admin profile
+    const currentAdmin = await SecondAdmin.findById(req.admin.id);
+    if (!currentAdmin) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Determine the image to be used
+    let image = currentAdmin.image;
+    if (newImage) {
+      // If there's a new image, delete the old image if it exists
+      if (image) {
+        const oldImagePath = path.join(__dirname, 'uploads', image);
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.log("Error deleting old image:", err);
+          }
+        });
+      }
+      image = newImage;
+    }
+
+    // Update the admin profile
+    const adminInfo = await SecondAdmin.findByIdAndUpdate(
       req.admin.id,
       {
         username,
+        organizername,
         email,
         image,
         linkedIn,
@@ -166,7 +195,7 @@ const updateadminProfile = async (req, res) => {
     );
 
     if (!adminInfo) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Failed to update user' });
     }
 
     res.json(adminInfo);
@@ -176,10 +205,33 @@ const updateadminProfile = async (req, res) => {
   }
 };
 
+
+const imageDelete = async(req, res) => {
+  const { filename } = req.params;
+  console.log(filename);
+  const filePath = path.join(__dirname, '../uploads', filename);
+
+  // Check if the file exists
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    // Delete the file
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error deleting the file' });
+      }
+      res.json({ message: 'File deleted successfully' });
+    });
+  });
+};
+
 module.exports = {
   LoginAdmin,
   AdmiRegister,
   GetSecondAdmin,
   updateadminProfile,
-  GetSecondAdminfontent
+  GetSecondAdminfontent,
+  imageDelete,
 };

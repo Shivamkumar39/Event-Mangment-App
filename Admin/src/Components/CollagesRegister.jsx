@@ -30,9 +30,7 @@ const CollagesRegister = () => {
         }
       });
 
-      // if (!response.ok) {
-      //   throw new Error('Failed to fetch admin profiles');
-      // }
+      
 
       const adminInfo = await response.json();
 
