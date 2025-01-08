@@ -7,7 +7,7 @@ const { body, check } = require('express-validator');
 const { registerRouter, loginUser, updateProfile, fetchusers } = require('./routes/usersRoutes'); 
 const path = require('path');
 const { AdmiRegister, LoginAdmin, GetSecondAdmin, updateadminProfile, GetSecondAdminfontent, imageDelete} = require('./routes/adminRoutes');
-const { postevent, FetchDataById, EventOnging, EventUpcoming, Eventcompleted } = require('./routes/eventRoutes');
+const { postevent, FetchDataById, EventOnging, EventUpcoming, Eventcompleted, updateEvent } = require('./routes/eventRoutes');
 
 
 
@@ -132,6 +132,7 @@ server.get('/events', JWTToken, FetchDataById)
 server.get('/events/ongoing', EventOnging)
 server.get('/events/upcoming', EventUpcoming)
 server.get('/events/completed', Eventcompleted)
+server.put('/events/update/:id', JWTToken, updateEvent);
 
 
 server.listen(PORT, () => {

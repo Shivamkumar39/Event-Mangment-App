@@ -29,7 +29,7 @@ const App = () => {
           <Route path='/adminprofile' element= {<ProfilePageAdmin/>}/>
           <Route path='/PostEvents' element={<PostEvents/>}/>
           <Route path='/register' element={<Register />} />
-          <Route path='/userprofile' element={<ProfilePage />} />
+          <Route path='/profilepage' element={<ProfilePage />} />
           
         </Routes>
       </div>

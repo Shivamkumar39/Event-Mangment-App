@@ -58,6 +58,27 @@ export const fetchEvents = createAsyncThunk(
   }
 );
 
+//fetch event with updating 
+export const updateEvent = createAsyncThunk(
+    'updateEvent',
+    async ({ id, eventData }, { rejectWithValue }) => {
+      try {
+        const formData = new FormData();
+        for (const key in eventData) {
+          formData.append(key, eventData[key]);
+        }
+  
+        const response = await axios.put(`${API_BASE_URL}/events/update/${id}`, formData, {
+          headers: {
+            'authToken': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );
 
 // Slice
 const eventSlice = createSlice({
@@ -95,7 +116,23 @@ const eventSlice = createSlice({
             .addCase(postEvent.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-            });
+            })
+
+            //updatingEvent
+            .addCase(updateEvent.pending, (state) => {
+                state.status = 'loading';
+              })
+            .addCase(updateEvent.fulfilled, (state, action) => {
+                state.loading = false;
+                const index = state.data.findIndex(event => event._id === action.payload._id);
+                if (index !== -1) {
+                  state.data[index] = action.payload;
+                }
+              })
+            .addCase(updateEvent.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+              });
     }
 });
 

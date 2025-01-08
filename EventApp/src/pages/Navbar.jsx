@@ -28,7 +28,7 @@ import logoPng  from '../assets/logo.png'
 // User menu list component
 const UserMenuList = ({ closeMenu, handleLogout }) => (
   <MenuList className="p-1">
-    <Link to='/userprofile'>
+    <Link to='/profilepage'>
       <MenuItem
         onClick={closeMenu}
         className='items-center gap-2 rounded flex'

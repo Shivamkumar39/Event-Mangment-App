@@ -63,40 +63,46 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if email format is valid
+    // Validate email format
     if (!isValidEmail(email)) {
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
-    let user = await User.findOne({ email });
+    // Check if user exists
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
+    // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: 'Incorrect password' });
     }
 
+    // Prepare user data for JWT payload and response
     const jwtuserdata = {
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username, // Add other user details as needed
-        mobile: user.mobile,
-        image: user.image
-      }
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      mobile: user.mobile,
+      image: user.image
     };
 
+    // Generate JWT
     const authToken = jwt.sign(jwtuserdata, process.env.JWT_SECRET);
 
-    res.json({ authToken, userInfo: data.user });
-    // console.log("🚀 ~ loginUser ~ user:", user)
+    // Send response
+    res.json({
+      authToken,
+      userInfo: jwtuserdata, // Returning the necessary user details
+    });
   } catch (err) {
     console.error('Error occurred while logging in:', err.message);
     res.status(500).send('Internal Server Error');
   }
 };
+
 
 // Helper function to validate email format
 function isValidEmail(email) {

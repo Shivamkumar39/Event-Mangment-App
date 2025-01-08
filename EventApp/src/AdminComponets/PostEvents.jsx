@@ -12,7 +12,7 @@ import React, { useEffect, useState } from 'react';
 import { FaGithub, FaGlobe, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
 import { FetchAdminProfile } from '../store/FetchAdminSlice';
-import EventSclice, { postEvent, fetchEventsById } from '../store/EventSclice';  // Corrected the import path
+import EventSclice, { postEvent, fetchEventsById, updateEvent } from '../store/EventSclice';  // Corrected the import path
 import CustomRadioGroup from '../components/CustomRadioButton';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -20,12 +20,16 @@ import { useNavigate } from 'react-router-dom';
 const PostEvents = () => {
   const dispatch = useDispatch();
   const [openDialog, setOpenDialog] = useState(false);
-  const { adminInfo } = useSelector(state => state.admin);
+  const [openUpdate, setOpenUpdate] = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const { adminInfo } = useSelector(state => state.admin); 
+  const { data: events } = useSelector(state => state.events);
 
+  //const { status, error } = useSelector((state) => state.events);
   const event = useSelector(state => state.event)
   const navigate = useNavigate()
 
-
+    
 
   const fetchAdminData = async () => {
     try {
@@ -40,6 +44,12 @@ const PostEvents = () => {
     setOpenDialog(!openDialog);
   };
 
+  const handleUpdate = (event) => {
+    setSelectedEvent(event);
+    setEventData(event);
+    setOpenUpdate(!openUpdate);
+  };
+
   const [eventData, setEventData] = useState({
     eventname: '',
     category: '',
@@ -52,6 +62,7 @@ const PostEvents = () => {
     status: 'upcoming',
     image: null,
   });
+
 
   // Handle input change
   const handleInputChange = (e) => {
@@ -122,6 +133,39 @@ const PostEvents = () => {
   };
 
 
+  
+
+  const handleSubmitUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await dispatch(updateEvent({ id: selectedEvent._id, eventData }));
+      toast.success('🦄 Event updated successfully', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setOpenUpdate(false);
+    } catch (error) {
+      toast.error('🦄 Failed to update event', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      console.log(error);
+    }
+  };
+
+
   return (
     <>
       <div className='m-10 flex-wrap flex flex-3 justify-center'>
@@ -169,6 +213,9 @@ const PostEvents = () => {
 
             <Button variant="gradient" type="submit" className='mb-2'  >
               Read More
+            </Button>
+            <Button variant="gradient" type="submit" className='mb-2' onClick={handleUpdate} >
+              Update Events
             </Button>
           </Card>
         })) :
@@ -276,6 +323,83 @@ const PostEvents = () => {
             Create New Event
           </Button>
         </div>
+
+
+
+
+{/* dilog for updeting data  */}
+<Dialog open={openUpdate} handler={handleUpdate} size="xl" className='justify-center items-center'>
+        <form className="m-10" onSubmit={handleSubmitUpdate}>
+          <Typography color="blue" className="font-medium" textGradient>Update Event</Typography>
+          <Input
+            name='eventname'
+            label='Event Name'
+            value={eventData.eventname}
+            onChange={handleInputChange}
+            className='m-5'
+          />
+          <CustomRadioGroup
+            label="Category"
+            value={eventData.category}
+            onChange={handleInputChange}
+          />
+          <Input
+            name='postDate'
+            label='Post Date'
+            value={eventData.postDate}
+            onChange={handleInputChange}
+            className='m-5'
+          />
+          <Input
+            name='lastDate'
+            label='Last Date'
+            value={eventData.lastDate}
+            onChange={handleInputChange}
+            className='m-5'
+          />
+          <Input
+            name='eventDate'
+            label='Event Date'
+            value={eventData.Eventdate}
+            onChange={handleInputChange}
+            className='m-5'
+          />
+          <Input
+            name='description'
+            label='Description'
+            value={eventData.description}
+            onChange={handleInputChange}
+            className='m-5'
+          />
+          <Input
+            name='location'
+            label='Location'
+            value={eventData.location}
+            onChange={handleInputChange}
+            className='m-5'
+          />
+          <Input
+            name='price'
+            label='Price'
+            value={eventData.price}
+            onChange={handleInputChange}
+            className='m-5'
+          />
+          <Input
+            type='file'
+            name='image'
+            label='Image'
+            onChange={handleImageChange}
+            className='m-5'
+          />
+          <Button type="submit">Update</Button>
+        </form>
+      </Dialog>
+
+
+
+
+
       </div>
     </>
   );

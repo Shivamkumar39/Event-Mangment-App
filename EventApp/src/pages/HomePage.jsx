@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Carousel, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Carousel, Input, Typography } from "@material-tailwind/react";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompletedEvents, fetchOngoingEvents, fetchUpcomingEvents } from '../store/EventOnStatus';
 import { fetchAdminProfilesWithoutAuthtoken } from '../store/AdminInfowWithoitToken';
@@ -7,6 +7,7 @@ import { FaGithub, FaGlobe, FaInstagram, FaLinkedin } from 'react-icons/fa';
 import puevents from '../assets/puevents.jpg'
 import pufest from '../assets/pufest.avif'
 import bobayevent from '../assets/bobayevent.jpeg'
+import MyCardFooter from '../components/Footercard';
 const HomePage = () => {
   const dispatch = useDispatch();
   const { upcomingEvents, ongoingEvents, completedEvents } = useSelector((state) => state.Status);
@@ -69,6 +70,7 @@ const HomePage = () => {
   };
 
   return (
+    <>
     <div className='mx-16 mt-4'>
       <Carousel loop={true} autoplay={true} className="rounded-xl w-full object-cover object-center shadow-xl">
         <figure className='h-[30rem] w-full'>
@@ -140,30 +142,42 @@ const HomePage = () => {
 
 
       {/* Top company Organize Events/ Hackthon /  WorkShops */}
-      <div className='justify-center items-center mt-10'>
+     
+      <div className='justify-center items-center mt-10 '>
 
         <h1 className='text-center text-3xl font-bold font-serif'>Top company /  Collages </h1>
-        <div className='flex flex-row '>
-        <Card className="w-96 m-4 justify-center items-center">
+        <div className='flex flex-wrap overflow-x-hidden justify-center items-center'>
+        <Card className="w-72 m-4 justify-center items-center">
         <CardBody className="text-center">
           <label>Parul university</label>
         </CardBody>
         </Card>
 
-        <Card className="w-96 m-4 justify-center items-center">
+        <Card className="w-72 m-4 justify-center items-center">
         <CardBody className="text-center">
           <label>Google</label>
         </CardBody>
         </Card>
 
 
-        <Card className="w-96 m-4 justify-center items-center">
+        <Card className="w-72 m-4 justify-center items-center">
         <CardBody className="text-center">
           <label>IIT Delhi</label>
         </CardBody>
         </Card>
 
-        <Card className="w-96 m-4 justify-center items-center">
+        <Card className="w-72 m-4 justify-center items-center">
+        <CardBody className="text-center">
+          <label>Indor.M.C</label>
+        </CardBody>
+        </Card>
+
+        <Card className="w-72 m-4 justify-center items-center">
+        <CardBody className="text-center">
+          <label>Indor.M.C</label>
+        </CardBody>
+        </Card>
+        <Card className="w-72 m-4 justify-center items-center">
         <CardBody className="text-center">
           <label>Indor.M.C</label>
         </CardBody>
@@ -171,14 +185,24 @@ const HomePage = () => {
 
         </div>
 
+      
       </div>
+
 
 
       <div className='justify-center items-center mt-10'>
         <h1 className='text-center text-3xl font-bold font-serif'>Blogs</h1>
+
+
       </div>
 
+
+      
     </div>
+
+    {/* footer */}
+    <MyCardFooter/>
+  </>
   );
 };
 

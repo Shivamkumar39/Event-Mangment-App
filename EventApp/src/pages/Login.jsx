@@ -32,59 +32,27 @@ const Login = () => {
     const { email, password } = formData;
 
     setLoading(true);
-    if (email && password) {
-      
-        try {
-        const response = await dispatch(loginUser(formData)).unwrap();
-        console.log(response);
-        // localStorage.setItem("authToken", response.authToken);
-        // localStorage.setItem("userInfo", JSON.stringify(response.userInfo));
-          navigate('/');
-
-          toast.success('🦄 Successfully logged in', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
-      }catch (err) {
-        console.log({err});
-        // setLoading(false);
-        toast.error(`Invalid Credentials Your password and email somthing rong`, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        setLoading(false);
-
-        return ;
-      }
-        //   if (err === 'Invalid email format') {
-        //     toast.error('Invalid email format', { position: "top-right" });
-        //   } else if (err === 'Invalid credentials') {
-        //     toast.error('Invalid credentials', { position: "top-right" });
-        //   } else if (err === 'Incorrect password') {
-        //     toast.error('Incorrect password', { position: "top-right" });
-        //   } else {
-        //     toast.error(err, { position: "top-right" });
-        //   }
-        // } finally {
-        //   setLoading(false);
-        // }
-      
-    } else {
-      toast.error("Please fill in all fied correct Becouse Your password and email somthing rong", { position: "top-right" });
+    if (!email && !password) {
+      toast.error("Please fill in all fields correctly.", {
+        position: "top-right",
+      });
+    }else{
+      setLoading(true);
+      try {
+      const response = await dispatch(loginUser(formData)).unwrap();
+     
+     //  localStorage.setItem("authToken", response.authToken);
+     //  localStorage.setItem("userInfo", JSON.stringify(response.userInfo));
+       toast.success("Successfully logged in!", { position: "top-right" });
+        navigate("/");
+    }catch (err) {
+      toast.error(err.message || "Login failed.", { position: "top-right" });
       setLoading(false);
+      navigate("/")
     }
+     
+    }
+    
   };
 
   return (
