@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const {validationResult } = require('express-validator');
-const User = require('../Schema/users'); 
+const { validationResult } = require('express-validator');
+const User = require('../Schema/users');
 const server = express.Router();
 
 // Middleware
@@ -14,7 +14,7 @@ const registerRouter = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  
+
   const { username, email, password, mobile } = req.body;
 
   try {
@@ -81,21 +81,20 @@ const loginUser = async (req, res) => {
     }
 
     // Prepare user data for JWT payload and response
-    const jwtuserdata = {
+    const userInfo = {
       id: user.id,
       email: user.email,
       username: user.username,
-      mobile: user.mobile,
-      image: user.image
+      mobile: user.mobile
     };
 
     // Generate JWT
-    const authToken = jwt.sign(jwtuserdata, process.env.JWT_SECRET);
+    const authToken = jwt.sign(userInfo, process.env.JWT_SECRET);
 
     // Send response
     res.json({
       authToken,
-      userInfo: jwtuserdata, // Returning the necessary user details
+      userInfo, // Returning the necessary user details
     });
   } catch (err) {
     console.error('Error occurred while logging in:', err.message);
@@ -113,55 +112,36 @@ function isValidEmail(email) {
 
 
 const updateProfile = async (req, res) => {
+  // if (mobile.length !== 10) {
+  //   return res.status(400).json({ error: 'Invalid mobile number' });
+  // }
   const { username, email, mobile, deleteImage } = req.body;
   const image = req.file ? req.file.filename : null;
+
   try {
-    
-    // Find and update the user by id
-    // let userInfo = await User.findByIdAndUpdate(req.user.id, {
-    //   username: username,
-    //   email: email,
-    //   mobile: mobile,
-    //   image: image
-      
-    // }, { new: true });
-    const emailExists = await User.findOne({ email: email, _id: { $ne: req.user.id } });
-    if (emailExists) {
-      return res.status(400).json({ error: 'Email already in use' });
-    }
-    const updateData = {
+    const emailExists = await User.findOne({ email, _id: { $ne: req.user.id } });
+    if (emailExists) return res.status(400).json({ error: 'Email already in use' });
 
-      username: username,
-      email: email,
-      mobile: mobile,
-    }// { new: true } ensures you get the updated document
-    if (deleteImage === 'true') {
-      updateData.image = null; // Set image to null if deleteImage flag is true
-    } else if (!userInfo.image && image) {
-      updateData.image = image; // Only update the image if it is not already present and deleteImage is not true
-    } else if (image) {
-      updateData.image = image; // Update the image if a new image is provided
-    }
+    const updateData = { username, email, mobile };
+    if (deleteImage === 'true') updateData.image = null;
+    if (image) updateData.image = image;
 
+    const user = await User.findByIdAndUpdate(req.user.id, updateData, { new: true });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-    userInfo = await User.findByIdAndUpdate(req.user.id, updateData, { new: true });
-    // Check if user was found and updated
-    if (!userInfo) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Return the updated user information
-    res.json(userInfo);
+    res.json(user);
   } catch (err) {
-    console.error('Error occurred while updating profile:', err.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
 const fetchusers = async (req, res) => {
-  try {
-    const userId = req.user.id; // Assuming req.user contains authenticated user details
 
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is missing' });
+    }
     // Fetch user profile from database by ID
     const user = await User.findById(userId);
 
@@ -175,13 +155,18 @@ const fetchusers = async (req, res) => {
       username: user.username,
       email: user.email,
       mobile: user.mobile,
-      image: user.image, // Assuming you store image file name or path in user document
+      image: user.image, // Assuming image file name or path is stored in DB.
     };
 
-    res.json(userInfo);
+    const authToken = jwt.sign(userInfo, process.env.JWT_SECRET);
+    res.json({
+      authToken,
+      userInfo, // Returning the necessary user details
+    });
+    //res.json(userInfo);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Error fetching user:", error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 

@@ -105,7 +105,7 @@ const adminSlice = createSlice({
     adminInfo: AdminInfoFromLocalStorage,
     loading: false,
     error: null,
-    authToken: localStorage.getItem('authToken') || null
+    authToken: null
   },
   reducers: {
     logoutAdmin: (state) => {

@@ -92,12 +92,15 @@ const Eventcompleted= async (req, res) => {
 const updateEvent = async (req, res) => {
     const { id } = req.params;
     const eventData = req.body;
+  console.log(eventData);
   
     try {
       const updatedEvent = await Event.findByIdAndUpdate(id, eventData, { new: true });
       if (!updatedEvent) {
         return res.status(404).json({ message: 'Event not found' });
       }
+      console.log(updateEvent);
+      
       res.json(updatedEvent);
     } catch (error) {
       res.status(500).json({ message: 'Server Error', error });

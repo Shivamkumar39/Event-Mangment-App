@@ -31,6 +31,7 @@ const App = () => {
           <Route path='/register' element={<Register />} />
           <Route path='/profilepage' element={<ProfilePage />} />
           
+          
         </Routes>
       </div>
 

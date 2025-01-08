@@ -16,6 +16,9 @@ const AdminLogin = ({ open, setOpen }) => {
     setOpen(false);
   };
 
+
+  // one admin ms university password:- ms@123
+  // one admin ms univeersity email:- ms12@msuniversity.sc.in
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Clear any previous errors

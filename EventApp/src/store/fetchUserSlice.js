@@ -13,7 +13,6 @@ export const registerUser = createAsyncThunk(
 
       return { ...response.data, authToken };
     } catch (error) {
-      
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -25,56 +24,51 @@ export const loginUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/login`, userData);
-      const { authToken, userInfo } = response.data; 
-      console.log("🚀 ~ user:", userInfo)
-      console.log("🚀 ~ response.data:", response.data)
+      const { authToken, userInfo } = response.data;
 
       localStorage.setItem('authToken', authToken);
       localStorage.setItem('userInfo', JSON.stringify(userInfo));
-      return { userInfo: userInfo, authToken };
 
-    } catch (error) {
-      console.log({error});
-      throw error;
-    }
-  }
-);
-
-// Async thunk to fetch user profile
-export const fetchUserProfile = createAsyncThunk(
-  'fetchProfile',
-  async (_, { rejectWithValue }) => {
-    try {
-      const authToken = localStorage.getItem('authToken');
-      if (!authToken) {
-        throw new Error('Auth token not found');
-      }
-
-      const response = await axios.get(`${API_BASE_URL}/profile`, {
-        headers: {
-          'authToken': `Bearer ${authToken}`,
-        }
-      });
-
-      console.log(response.data); // Assuming response structure is { userInfo }
-      return response.data; // Adjust this line based on your actual response structure
-      
+      return { userInfo, authToken };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
-// Async thunk to update user profile
+// Async thunk to fetch user profile
+export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (_, { rejectWithValue }) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    if (!authToken) {
+      throw new Error('Auth token not found');
+    }
+
+    // Ensure the header key is 'Authorization'
+    const response = await axios.get(`${API_BASE_URL}/profilepage`, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${authToken}`,
+      },
+    });
+
+    return response.data; // Assuming response structure is { userInfo }
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+
+    return rejectWithValue(
+      error.response?.data || error.message || 'Something went wrong'
+    );
+  }
+});
+
+
+// Update user profile thunk
 export const updateUserProfile = createAsyncThunk(
   'updateProfile',
   async (profileData, { rejectWithValue }) => {
-
-
-  
     try {
       const formData = new FormData();
-      // formData.append('id', profileData.id);
       formData.append('username', profileData.username);
       formData.append('email', profileData.email);
       formData.append('mobile', profileData.mobile);
@@ -85,27 +79,26 @@ export const updateUserProfile = createAsyncThunk(
       }
 
       const authToken = localStorage.getItem('authToken');
-      if (!authToken) {
-        throw new Error('Auth token not found');
-      }
+      if (!authToken) throw new Error('Auth token not found');
 
       const response = await axios.post(`${API_BASE_URL}/updateProfile`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          authToken: authToken
-        }
+          'authToken': `Bearer ${authToken}`, // Standard Authorization header
+        },
       });
 
       return response.data;
     } catch (error) {
-      console.error('Error updating profile:', error);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
 // Get user info from localStorage
-const userInfoFromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
+const userInfoFromLocalStorage = localStorage.getItem('userInfo')
+  ? JSON.parse(localStorage.getItem('userInfo'))
+  : null;
 
 // Create user slice with initial state
 const userSlice = createSlice({
@@ -114,14 +107,14 @@ const userSlice = createSlice({
     userInfo: userInfoFromLocalStorage,
     loading: false,
     error: null,
-    authToken:  null,
+    authToken: localStorage.getItem('authToken') || null,
   },
   reducers: {
     logoutUser: (state) => {
       state.userInfo = null;
       state.authToken = null;
-      // localStorage.removeItem('authToken');
-      // localStorage.removeItem('userInfo');
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userInfo');
     },
   },
   extraReducers: (builder) => {
@@ -147,26 +140,24 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.userInfo = action.payload.userInfo;
+        state.userInfo = action.payload.userInfo; // Fix: action.payload should have userInfo directly
         state.authToken = action.payload.authToken;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // Fetch user profile
       .addCase(fetchUserProfile.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.userInfo = action.payload;
-        state.error = null;
+        state.userInfo = action.payload.userInfo; // Make sure you store userInfo correctly
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || action.error.message || 'Error fetching profile';
+        state.error = action.payload;
       })
       // Update user profile
       .addCase(updateUserProfile.pending, (state) => {

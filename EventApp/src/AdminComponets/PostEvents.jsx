@@ -22,14 +22,14 @@ const PostEvents = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const { adminInfo } = useSelector(state => state.admin); 
-  const { data: events } = useSelector(state => state.events);
+  const { adminInfo } = useSelector(state => state.admin);
+  //const { data: event} = useSelector(state => state.events);
 
   //const { status, error } = useSelector((state) => state.events);
   const event = useSelector(state => state.event)
   const navigate = useNavigate()
 
-    
+
 
   const fetchAdminData = async () => {
     try {
@@ -45,10 +45,14 @@ const PostEvents = () => {
   };
 
   const handleUpdate = (event) => {
-    setSelectedEvent(event);
-    setEventData(event);
-    setOpenUpdate(!openUpdate);
-  };
+   
+     setSelectedEvent(event);
+     setEventData(event);
+     setOpenUpdate(true);
+
+   };
+
+
 
   const [eventData, setEventData] = useState({
     eventname: '',
@@ -133,7 +137,7 @@ const PostEvents = () => {
   };
 
 
-  
+
 
   const handleSubmitUpdate = async (e) => {
     e.preventDefault();
@@ -214,7 +218,7 @@ const PostEvents = () => {
             <Button variant="gradient" type="submit" className='mb-2'  >
               Read More
             </Button>
-            <Button variant="gradient" type="submit" className='mb-2' onClick={handleUpdate} >
+            <Button variant="gradient" type="submit" className='mb-2' onClick={() => handleUpdate(e._id)} >
               Update Events
             </Button>
           </Card>
@@ -239,7 +243,7 @@ const PostEvents = () => {
           <Card className="mx-auto w-full max-w-[24rem] overflow-y-scroll h-screen">
             <form onSubmit={handleSubmit}>
               <CardHeader floated={false} className="h-52">
-               
+
                 <div>
                   {event.data.image ? (
                     <img src={event.data.image} alt=" Profile Image all ready Uploaded" />
@@ -327,75 +331,54 @@ const PostEvents = () => {
 
 
 
-{/* dilog for updeting data  */}
-<Dialog open={openUpdate} handler={handleUpdate} size="xl" className='justify-center items-center'>
-        <form className="m-10" onSubmit={handleSubmitUpdate}>
-          <Typography color="blue" className="font-medium" textGradient>Update Event</Typography>
-          <Input
-            name='eventname'
-            label='Event Name'
-            value={eventData.eventname}
-            onChange={handleInputChange}
-            className='m-5'
-          />
-          <CustomRadioGroup
-            label="Category"
-            value={eventData.category}
-            onChange={handleInputChange}
-          />
-          <Input
-            name='postDate'
-            label='Post Date'
-            value={eventData.postDate}
-            onChange={handleInputChange}
-            className='m-5'
-          />
-          <Input
-            name='lastDate'
-            label='Last Date'
-            value={eventData.lastDate}
-            onChange={handleInputChange}
-            className='m-5'
-          />
-          <Input
-            name='eventDate'
-            label='Event Date'
-            value={eventData.Eventdate}
-            onChange={handleInputChange}
-            className='m-5'
-          />
-          <Input
-            name='description'
-            label='Description'
-            value={eventData.description}
-            onChange={handleInputChange}
-            className='m-5'
-          />
-          <Input
-            name='location'
-            label='Location'
-            value={eventData.location}
-            onChange={handleInputChange}
-            className='m-5'
-          />
-          <Input
-            name='price'
-            label='Price'
-            value={eventData.price}
-            onChange={handleInputChange}
-            className='m-5'
-          />
-          <Input
-            type='file'
-            name='image'
-            label='Image'
-            onChange={handleImageChange}
-            className='m-5'
-          />
-          <Button type="submit">Update</Button>
-        </form>
-      </Dialog>
-
+        {/* dilog for updeting data  */}
+        <Dialog size="xs" open={openUpdate} handler={() => setOpenUpdate(false)} className="bg-transparent shadow-none">
+          <Card className="mx-auto w-full max-w-[24rem] overflow-y-scroll h-screen">
+            <form onSubmit={handleSubmitUpdate}>
+              <CardHeader floated={false} className="h-52">
+                <div>
+                  {eventData.image ? (
+                    <img src={eventData.image} alt="Profile Image already Uploaded" />
+                  ) : (
+                    <Input name="image" type="file" onChange={handleImageChange} />
+                  )}
+                </div>
+              </CardHeader>
+              <CardBody className="text-center mb-1">
+                <Typography variant="h4" color="blue-gray" className="mb-2">Update Event</Typography>
+                <Typography className="mt-2" variant="h6">Event Name</Typography>
+                <Input name="eventname" value={eventData.eventname} size="lg" onChange={handleInputChange} />
+                <Typography className="mt-2" variant="h6">Category</Typography>
+                <div onChange={handleInputChange} className='flex flex-row m-2'>
+                  <input type="radio" value="college events" name="category" checked={eventData.category === "college events"} /> College Events
+                  <input type="radio" value="company events" name="category" checked={eventData.category === "company events"} /> Company Events
+                  <input type="radio" value="exhibition events" name="category" checked={eventData.category === "exhibition events"} /> Exhibition Events
+                </div>
+                <Typography className="mt-2" variant="h6">Description</Typography>
+                <Input name="description" value={eventData.description} size="lg" onChange={handleInputChange} />
+                <Typography className="mt-2" variant="h6">Post Date</Typography>
+                <Input name="postDate" type="date" value={eventData.postDate} size="lg" onChange={handleInputChange} required />
+                <Typography className="mt-2" variant="h6">Last Date</Typography>
+                <Input name="lastDate" type="date" value={eventData.lastDate} size="lg" onChange={handleInputChange} required />
+                <Typography className="mt-2" variant="h6">Event Date</Typography>
+                <Input name="Eventdate" type="date" value={eventData.Eventdate} size="lg" onChange={handleInputChange} required />
+                <Typography className="mt-2" variant="h6">Location</Typography>
+                <Input name="location" value={eventData.location} size="lg" onChange={handleInputChange} required />
+                <Typography className="mt-2" variant="h6">Price</Typography>
+                <Input name="price" value={eventData.price} size="lg" onChange={handleInputChange} />
+                <Typography className="mt-2" variant="h6">Status</Typography>
+                <div onChange={handleStatusChange} className='flex flex-row m-2'>
+                  <input type="radio" value="ongoing" name="status" checked={eventData.status === 'Ongoing'} /> Ongoing
+                  <input type="radio" value="upcoming" name="status" checked={eventData.status === 'upcoming'} /> upcomping
+                  <input type="radio" value="complete" name="status" checked={eventData.status === 'complete'} /> complete
+                </div>
+              </CardBody>
+              <CardFooter className="pt-0">
+                <Button type="submit" variant="gradient" fullWidth  onClick={() => handleUpdate}>Update Event</Button>
+              </CardFooter>
+            </form>
+          </Card>
+        </Dialog>
 
 
 

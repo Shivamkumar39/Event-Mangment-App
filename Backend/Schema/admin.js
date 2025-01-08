@@ -43,6 +43,6 @@ const SecondAdminSchema = new Schema({
   }
 });
 
-const SecondAdmin = mongoose.model('SecondAdmin', SecondAdminSchema);
+const SecondAdmin = mongoose.model('SecondAdmins', SecondAdminSchema);
 
 module.exports = SecondAdmin

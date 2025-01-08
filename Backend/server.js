@@ -1,12 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const multer  = require('multer');
+const multer = require('multer');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const { body, check } = require('express-validator');
-const { registerRouter, loginUser, updateProfile, fetchusers } = require('./routes/usersRoutes'); 
+const { registerRouter, loginUser, updateProfile, fetchusers } = require('./routes/usersRoutes');
 const path = require('path');
-const { AdmiRegister, LoginAdmin, GetSecondAdmin, updateadminProfile, GetSecondAdminfontent, imageDelete} = require('./routes/adminRoutes');
+const { AdmiRegister, LoginAdmin, GetSecondAdmin, updateadminProfile, GetSecondAdminfontent, imageDelete } = require('./routes/adminRoutes');
 const { postevent, FetchDataById, EventOnging, EventUpcoming, Eventcompleted, updateEvent } = require('./routes/eventRoutes');
 
 
@@ -39,31 +39,26 @@ server.use(express.json());
 
 // JWT Middleware
 const JWTToken = (req, res, next) => {
-    const authToken = req.header('authToken')?.replace('Bearer ',''); //?.replace('Bearer ', '')
-    
+    const token = req.header('authToken') || req.header('Authorization');
+    const authToken = token.startsWith('Bearer ') ? token.replace('Bearer ', '') : token;
+   // const authToken = req.header('authToken')?.replace('Bearer ', ''); //?.replace('Bearer ', '')
+    console.log("token id:", authToken);
+
     if (!authToken) {
         return res.status(401).json({ error: 'Please provide a valid token' });
     }
 
     try {
-        // const data = jwt.verify(authToken, process.env.JWT_SECRET);
-        // req.user = data.user || data.admin; 
-        // if (!data.user) {
-        //     return res.status(401).json({ error: 'Invalid token structure' });
-        // }
-
         const data = jwt.verify(authToken, process.env.JWT_SECRET);
-
-        if (!data.user && !data.admin) {
-          return res.status(401).json({ error: 'Invalid token structure' });
-        }
-    
-        req.user = data.user || null;
+        req.user = data || null;
         req.admin = data.admin || null;
-        
         next();
+
+
+
+
     } catch (error) {
-        console.error('JWT Verification Error:', error);
+        console.error('JWT Verification Error:', error.message);
         return res.status(401).send({ error: 'Invalid token or unauthorized access' });
     }
 };
@@ -104,7 +99,7 @@ server.post('/login', [
 ], loginUser);
 
 server.post('/updateProfile', JWTToken, upload.single('image'), updateProfile);
-server.get('/profile', JWTToken, fetchusers)
+server.get('/profilepage',JWTToken, fetchusers)
 
 
 
@@ -115,15 +110,15 @@ server.get('/profile', JWTToken, fetchusers)
 // Admin Routes
 server.post('/AdmiRegister', AdmiRegister)
 server.post('/admin-Login', LoginAdmin)
-server.get('/getAdminProfile',  GetSecondAdmin)
-server.get('/adminprofileFrontent',JWTToken, GetSecondAdminfontent)
-server.post('/updateadminProfile',JWTToken,  upload.single('image'), updateadminProfile)
+server.get('/getAdminProfile', GetSecondAdmin)
+server.get('/adminprofileFrontent', JWTToken, GetSecondAdminfontent)
+server.post('/updateadminProfile', JWTToken, upload.single('image'), updateadminProfile)
 
 
 
 //event paost and fetch
 server.post(
-    '/postevent', 
+    '/postevent',
     JWTToken,
     upload.single('image'), postevent)
 
