@@ -8,8 +8,7 @@ const { registerRouter, loginUser, updateProfile, fetchusers } = require('./rout
 const path = require('path');
 const { AdmiRegister, LoginAdmin, GetSecondAdmin, updateadminProfile, GetSecondAdminfontent, imageDelete } = require('./routes/adminRoutes');
 const { postevent, FetchDataById, EventOnging, EventUpcoming, Eventcompleted, updateEvent } = require('./routes/eventRoutes');
-
-
+const { createQuiz, updateQuiz, startQuizAfterPayment, getLeaderboard } = require('./routes/quizeesRouter');
 
 
 
@@ -41,7 +40,7 @@ server.use(express.json());
 const JWTToken = (req, res, next) => {
     const token = req.header('authToken') || req.header('Authorization');
     const authToken = token.startsWith('Bearer ') ? token.replace('Bearer ', '') : token;
-   // const authToken = req.header('authToken')?.replace('Bearer ', ''); //?.replace('Bearer ', '')
+    // const authToken = req.header('authToken')?.replace('Bearer ', ''); //?.replace('Bearer ', '')
     console.log("token id:", authToken);
 
     if (!authToken) {
@@ -99,7 +98,7 @@ server.post('/login', [
 ], loginUser);
 
 server.post('/updateProfile', JWTToken, upload.single('image'), updateProfile);
-server.get('/profilepage',JWTToken, fetchusers)
+server.get('/profilepage', JWTToken, fetchusers)
 
 
 
@@ -128,6 +127,29 @@ server.get('/events/ongoing', EventOnging)
 server.get('/events/upcoming', EventUpcoming)
 server.get('/events/completed', Eventcompleted)
 server.put('/events/update/:id', JWTToken, updateEvent);
+
+//quize
+server.post(
+    '/createQuizze',
+    [
+        body("title").notEmpty(),
+        body("questions").isArray({ min: 1 }),
+        body("startTime").notEmpty(),
+        body("endTime").notEmpty(),
+        body("price").isNumeric(),
+    ],
+    createQuiz
+);
+
+// Update Quiz
+server.put("/update/:id", updateQuiz);
+
+// Start Quiz After Payment
+server.post("/start", startQuizAfterPayment);
+
+// Get Leaderboard
+server.get("/leaderboard/:quizId", getLeaderboard);
+
 
 
 server.listen(PORT, () => {

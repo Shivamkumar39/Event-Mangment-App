@@ -4,6 +4,7 @@ import LoginPage from './Components/LoginPage';
 import HomePage from './Components/HomePage';
 import MainLayout from './Components/Mainlayout';
 import CollagesRegister from './Components/CollagesRegister';
+import PostQuize from './Components/PostQuize';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,6 +21,7 @@ const App = () => {
         >
           <Route index element={<HomePage />} />
           <Route path='/CollagesRegister' element={<CollagesRegister/>}/>
+           <Route path='/Quizes' element={<PostQuize/>}/>
         </Route>
         <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} replace />} />
       </Routes>

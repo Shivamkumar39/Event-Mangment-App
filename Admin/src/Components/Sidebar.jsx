@@ -1,7 +1,7 @@
 // src/components/Sidebar.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { HomeIcon, AcademicCapIcon, CalendarIcon, UserIcon } from '@heroicons/react/24/solid';
+import { HomeIcon, AcademicCapIcon, CalendarIcon, UserIcon, ListBulletIcon } from '@heroicons/react/24/solid';
 
 const Sidebar = () => {
     return (
@@ -23,6 +23,9 @@ const Sidebar = () => {
                 </Link>
                 <Link to="/profile" className="block py-2.5 px-4 hover:bg-gray-700 flex items-center">
                     <UserIcon className="h-5 w-5 mr-2" /> Profile
+                </Link>
+                <Link to="/Quizes" className="block py-2.5 px-4 hover:bg-gray-700 flex items-center">
+                    <ListBulletIcon className="h-5 w-5 mr-2" /> Create Quize
                 </Link>
                 {/* Add more links as needed */}
             </nav>
